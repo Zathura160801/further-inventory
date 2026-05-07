@@ -31,8 +31,6 @@
                         @endif
                     </div>
                     <div class="d-flex w-100 justify-content-end gap-2 align-self-start ms-md-auto">
-                        <a class="btn btn-outline-primary"
-                            href="{{ route('boxes.create', ['parent_id' => $box->id]) }}">{{ __('boxes.add_child') }}</a>
                         <a class="btn btn-outline-secondary"
                             href="{{ route('boxes.edit', $box) }}">{{ __('boxes.edit') }}</a>
                     </div>

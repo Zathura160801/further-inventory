@@ -6,7 +6,7 @@
         <select class="form-select" id="parent_id" name="parent_id">
             <option value="">{{ __('boxes.no_parent') }}</option>
             @foreach ($boxes as $parentOption)
-                <option value="{{ $parentOption->id }}" @selected(old('parent_id', $box->parent_id ?? $parent?->id ?? '') == $parentOption->id)>
+                <option value="{{ $parentOption->id }}" @selected(old('parent_id', $box->parent_id ?? ($parent?->id ?? '')) == $parentOption->id)>
                     {!! str_repeat('&mdash; ', max(0, $parentOption->level - 1)) !!}{{ $parentOption->code }}
                 </option>
             @endforeach
@@ -16,8 +16,8 @@
 
     <div class="col-md-6">
         <label class="form-label" for="code">{{ __('boxes.box_code') }}</label>
-        <input class="form-control text-uppercase" id="code" name="code" value="{{ old('code', $box->code ?? $suggestedCode ?? '') }}" required>
-        <div class="form-text">{{ __('boxes.code_dynamic_help') }}</div>
+        <input class="form-control text-uppercase" id="code" name="code"
+            value="{{ old('code', $box->code ?? ($suggestedCode ?? '')) }}" required>
     </div>
 
     <div class="col-md-4">
@@ -42,5 +42,6 @@
 
 <div class="d-flex gap-2 mt-4">
     <button class="btn btn-primary" type="submit">{{ __('boxes.save') }}</button>
-    <a class="btn btn-outline-secondary" href="{{ isset($box) ? route('boxes.show', $box) : route('boxes.index') }}">{{ __('boxes.cancel') }}</a>
+    <a class="btn btn-outline-secondary"
+        href="{{ isset($box) ? route('boxes.show', $box) : route('boxes.index') }}">{{ __('boxes.cancel') }}</a>
 </div>

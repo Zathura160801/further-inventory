@@ -19,7 +19,7 @@
                             @endif
                         </div>
                         <div class="d-flex justify-content-end">
-                            <a class="btn btn-sm btn-outline-primary ms-auto"
+                            <a class="btn btn-sm btn-outline-primary ms-auto align-self-start"
                                 href="{{ route('boxes.create', ['parent_id' => $box->id]) }}">{{ __('boxes.add_child') }}</a>
                         </div>
                     </div>
