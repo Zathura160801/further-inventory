@@ -16,7 +16,7 @@
 
         @if ($parent)
             <div class="alert alert-info">
-                {!! __('boxes.goes_inside', ['code' => e($parent->code), 'title' => e($parent->title)]) !!}
+                {!! __('boxes.goes_inside', ['code' => e($parent->code)]) !!}
             </div>
         @endif
 

@@ -13,6 +13,14 @@ use Illuminate\View\View;
 
 class BoxController extends Controller
 {
+    public function home(): View
+    {
+        return view('welcome', [
+            'totalBoxes' => Box::query()->count(),
+            'rootBoxes' => Box::query()->whereNull('parent_id')->count(),
+        ]);
+    }
+
     public function index(): View
     {
         $boxes = Box::query()
@@ -28,7 +36,7 @@ class BoxController extends Controller
     {
         $parent = Box::find($request->integer('parent_id'));
         $boxes = Box::query()->orderBy('code')->get();
-        $suggestedCode = $this->nextCode($parent);
+        $suggestedCode = $this->nextCode();
 
         return view('boxes.create', compact('boxes', 'parent', 'suggestedCode'));
     }
@@ -38,9 +46,8 @@ class BoxController extends Controller
         $validated = $request->validate([
             'parent_id' => ['nullable', 'exists:boxes,id'],
             'code' => ['required', 'string', 'max:80', 'unique:boxes,code'],
-            'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'status' => ['required', Rule::in(['packed', 'moving', 'unpacked'])],
+            'status' => ['required', Rule::in(['packed', 'unpacked'])],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'max:4096'],
         ]);
@@ -48,17 +55,10 @@ class BoxController extends Controller
         $parent = Box::find($validated['parent_id'] ?? null);
         $code = Str::upper($validated['code']);
 
-        if (! $this->codeMatchesParent($code, $parent)) {
-            return back()
-                ->withErrors(['code' => __('boxes.code_parent_error')])
-                ->withInput();
-        }
-
         $box = Box::create([
             'parent_id' => $parent?->id,
             'code' => $code,
             'qr_uuid' => (string) Str::uuid(),
-            'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
             'level' => $parent ? $parent->level + 1 : 1,
             'status' => $validated['status'],
@@ -74,15 +74,16 @@ class BoxController extends Controller
     public function show(Box $box): View
     {
         $box->load('parent', 'children.images', 'images');
+        $ancestors = $box->ancestorTrail();
 
-        return view('boxes.show', compact('box'));
+        return view('boxes.show', compact('ancestors', 'box'));
     }
 
     public function edit(Box $box): View
     {
+        $blockedParentIds = [$box->id, ...$box->descendantIds()];
         $boxes = Box::query()
-            ->where('id', '!=', $box->id)
-            ->where('code', 'not like', $box->code.'-%')
+            ->whereNotIn('id', $blockedParentIds)
             ->orderBy('code')
             ->get();
 
@@ -94,9 +95,8 @@ class BoxController extends Controller
         $validated = $request->validate([
             'parent_id' => ['nullable', 'exists:boxes,id'],
             'code' => ['required', 'string', 'max:80', Rule::unique('boxes', 'code')->ignore($box)],
-            'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'status' => ['required', Rule::in(['packed', 'moving', 'unpacked'])],
+            'status' => ['required', Rule::in(['packed', 'unpacked'])],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'max:4096'],
         ]);
@@ -104,22 +104,15 @@ class BoxController extends Controller
         $parent = Box::find($validated['parent_id'] ?? null);
         $code = Str::upper($validated['code']);
 
-        if ($parent?->id === $box->id || ($parent?->code && str_starts_with($parent->code, $box->code.'-'))) {
+        if ($parent && in_array($parent->id, [$box->id, ...$box->descendantIds()], true)) {
             return back()
                 ->withErrors(['parent_id' => __('boxes.parent_error')])
-                ->withInput();
-        }
-
-        if (! $this->codeMatchesParent($code, $parent)) {
-            return back()
-                ->withErrors(['code' => __('boxes.code_parent_error')])
                 ->withInput();
         }
 
         $box->update([
             'parent_id' => $parent?->id,
             'code' => $code,
-            'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
             'level' => $parent ? $parent->level + 1 : 1,
             'status' => $validated['status'],
@@ -164,6 +157,19 @@ class BoxController extends Controller
         return back()->with('success', __('boxes.photo_deleted'));
     }
 
+    public function updateNotes(Request $request, Box $box): RedirectResponse
+    {
+        $validated = $request->validate([
+            'description' => ['nullable', 'string'],
+        ]);
+
+        $box->update([
+            'description' => $validated['description'] ?? null,
+        ]);
+
+        return back()->with('success', __('boxes.notes_updated'));
+    }
+
     public function scan(): View
     {
         return view('boxes.scan');
@@ -175,8 +181,9 @@ class BoxController extends Controller
             ->where('qr_uuid', $qrUuid)
             ->with('parent', 'children.images', 'images')
             ->firstOrFail();
+        $ancestors = $box->ancestorTrail();
 
-        return view('boxes.show', compact('box'));
+        return view('boxes.scanned', compact('ancestors', 'box'));
     }
 
     private function storeImages(Request $request, Box $box): void
@@ -201,34 +208,16 @@ class BoxController extends Controller
         return is_array($files) ? $files : [$files];
     }
 
-    private function nextCode(?Box $parent): string
+    private function nextCode(): string
     {
         $nextNumber = 1;
 
-        if ($parent) {
-            do {
-                $code = $parent->code.'-'.str_pad((string) $nextNumber, 2, '0', STR_PAD_LEFT);
-                $nextNumber++;
-            } while (Box::query()->where('code', $code)->exists());
-
-            return $code;
-        }
-
         do {
-            $code = 'B'.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+            $code = 'BOX'.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
             $nextNumber++;
         } while (Box::query()->where('code', $code)->exists());
 
         return $code;
-    }
-
-    private function codeMatchesParent(string $code, ?Box $parent): bool
-    {
-        if (! $parent) {
-            return ! str_contains($code, '-');
-        }
-
-        return str_starts_with($code, $parent->code.'-');
     }
 
     private function syncDescendantLevels(Box $box): void

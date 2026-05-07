@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class Box extends Model
 {
@@ -15,7 +16,6 @@ class Box extends Model
         'parent_id',
         'code',
         'qr_uuid',
-        'title',
         'description',
         'level',
         'status',
@@ -41,10 +41,37 @@ class Box extends Model
         return $this->hasMany(BoxImage::class);
     }
 
+    /**
+     * @return array<int, int>
+     */
+    public function descendantIds(): array
+    {
+        $this->loadMissing('children');
+
+        return $this->children
+            ->flatMap(fn (Box $child): array => [$child->id, ...$child->descendantIds()])
+            ->all();
+    }
+
+    /**
+     * @return Collection<int, Box>
+     */
+    public function ancestorTrail(): Collection
+    {
+        $ancestors = collect();
+        $parent = $this->parent;
+
+        while ($parent) {
+            $ancestors->prepend($parent);
+            $parent = $parent->parent;
+        }
+
+        return $ancestors;
+    }
+
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            'moving' => __('boxes.moving'),
             'unpacked' => __('boxes.unpacked'),
             default => __('boxes.packed'),
         };

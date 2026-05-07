@@ -7,27 +7,23 @@
             <option value="">{{ __('boxes.no_parent') }}</option>
             @foreach ($boxes as $parentOption)
                 <option value="{{ $parentOption->id }}" @selected(old('parent_id', $box->parent_id ?? $parent?->id ?? '') == $parentOption->id)>
-                    {{ $parentOption->code }} - {{ $parentOption->title }}
+                    {!! str_repeat('&mdash; ', max(0, $parentOption->level - 1)) !!}{{ $parentOption->code }}
                 </option>
             @endforeach
         </select>
+        <div class="form-text">{{ __('boxes.parent_help') }}</div>
     </div>
 
     <div class="col-md-6">
         <label class="form-label" for="code">{{ __('boxes.box_code') }}</label>
         <input class="form-control text-uppercase" id="code" name="code" value="{{ old('code', $box->code ?? $suggestedCode ?? '') }}" required>
-        <div class="form-text">{{ __('boxes.code_example') }}</div>
-    </div>
-
-    <div class="col-md-8">
-        <label class="form-label" for="title">{{ __('boxes.short_name') }}</label>
-        <input class="form-control" id="title" name="title" value="{{ old('title', $box->title ?? '') }}" required>
+        <div class="form-text">{{ __('boxes.code_dynamic_help') }}</div>
     </div>
 
     <div class="col-md-4">
         <label class="form-label" for="status">{{ __('boxes.status') }}</label>
         <select class="form-select" id="status" name="status" required>
-            @foreach (['packed' => __('boxes.packed'), 'moving' => __('boxes.moving'), 'unpacked' => __('boxes.unpacked')] as $value => $label)
+            @foreach (['packed' => __('boxes.packed'), 'unpacked' => __('boxes.unpacked')] as $value => $label)
                 <option value="{{ $value }}" @selected(old('status', $box->status ?? 'packed') === $value)>{{ $label }}</option>
             @endforeach
         </select>

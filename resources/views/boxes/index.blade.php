@@ -5,13 +5,12 @@
 @endsection
 
 @section('content')
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
         <div>
             <h1 class="h3 mb-1">{{ __('boxes.box_list') }}</h1>
             <p class="text-muted mb-0">{{ __('boxes.box_list_intro') }}</p>
         </div>
-        <div class="d-flex gap-2">
-            <a class="btn btn-outline-secondary" href="{{ route('boxes.scan') }}">{{ __('boxes.scan_qr') }}</a>
+        <div class="d-flex justify-content-end w-100 w-md-auto gap-2">
             <a class="btn btn-primary" href="{{ route('boxes.create') }}">{{ __('boxes.add_box') }}</a>
         </div>
     </div>

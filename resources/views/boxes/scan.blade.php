@@ -1,9 +1,8 @@
 @extends('layouts.app', ['title' => __('boxes.scan_heading')])
 
-@section('backUrl', route('boxes.index'))
+@section('backUrl', route('home'))
 
 @section('breadcrumbs')
-    <li class="breadcrumb-item"><a href="{{ route('boxes.index') }}">{{ __('boxes.box_list') }}</a></li>
     <li class="breadcrumb-item active" aria-current="page">{{ __('boxes.scan_qr') }}</li>
 @endsection
 

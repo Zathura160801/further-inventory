@@ -1,20 +1,17 @@
 @php
-    $id = $id ?? 'photo-uploader-'.Illuminate\Support\Str::uuid();
+    $id = $id ?? 'photo-uploader-' . Illuminate\Support\Str::uuid();
 @endphp
 
-<div
-    class="border rounded-3 p-3"
-    data-photo-uploader
-    data-remove-label="{{ __('boxes.remove_photo') }}"
-    data-camera-error="{{ __('boxes.camera_unavailable') }}"
->
-    <input class="d-none" id="{{ $id }}-input" data-photo-input name="images[]" type="file" accept="image/*" multiple>
+<div class="border rounded-3 p-3" data-photo-uploader data-remove-label="{{ __('boxes.remove_photo') }}"
+    data-camera-error="{{ __('boxes.camera_unavailable') }}">
+    <input class="d-none" id="{{ $id }}-input" data-photo-input name="images[]" type="file" accept="image/*"
+        multiple>
 
-    <div class="d-flex flex-wrap gap-2 mb-2">
-        <button class="btn btn-outline-primary" type="button" data-photo-select>
+    <div class="d-flex flex-column flex-sm-row gap-2 mb-2">
+        <button class="btn btn-outline-primary w-100 w-sm-auto" type="button" data-photo-select>
             {{ __('boxes.add_photos') }}
         </button>
-        <button class="btn btn-outline-secondary" type="button" data-camera-open>
+        <button class="btn btn-outline-secondary w-100 w-sm-auto" type="button" data-camera-open>
             {{ __('boxes.open_camera') }}
         </button>
     </div>
@@ -22,12 +19,13 @@
     <div class="form-text mb-3">{{ __('boxes.photos_help') }}</div>
 
     <div class="d-none mb-3" data-camera-panel>
-        <video class="w-100 rounded border bg-dark mb-2" data-camera-video autoplay playsinline muted style="max-height: 360px; object-fit: cover;"></video>
-        <div class="d-flex flex-wrap gap-2">
-            <button class="btn btn-primary" type="button" data-camera-capture>
+        <video class="w-100 rounded border bg-dark mb-2" data-camera-video autoplay playsinline muted
+            style="max-height: 360px; object-fit: cover;"></video>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+            <button class="btn btn-primary w-100 w-sm-auto" type="button" data-camera-capture>
                 {{ __('boxes.capture_photo') }}
             </button>
-            <button class="btn btn-outline-secondary" type="button" data-camera-close>
+            <button class="btn btn-outline-secondary w-100 w-sm-auto" type="button" data-camera-close>
                 {{ __('boxes.close_camera') }}
             </button>
         </div>
@@ -117,7 +115,11 @@
 
                     try {
                         stream = await navigator.mediaDevices.getUserMedia({
-                            video: { facingMode: { ideal: 'environment' } },
+                            video: {
+                                facingMode: {
+                                    ideal: 'environment'
+                                }
+                            },
                             audio: false,
                         });
                         cameraVideo.srcObject = stream;
@@ -138,7 +140,9 @@
                         }
 
                         addFiles([
-                            new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' })
+                            new File([blob], `camera-${Date.now()}.jpg`, {
+                                type: 'image/jpeg'
+                            })
                         ]);
                     }, 'image/jpeg', 0.92);
                 });

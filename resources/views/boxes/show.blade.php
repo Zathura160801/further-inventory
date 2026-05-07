@@ -1,12 +1,12 @@
-@extends('layouts.app', ['title' => $box->code . ' - ' . $box->title])
+@extends('layouts.app', ['title' => $box->code])
 
 @section('backUrl', $box->parent ? route('boxes.show', $box->parent) : route('boxes.index'))
 
 @section('breadcrumbs')
     <li class="breadcrumb-item"><a href="{{ route('boxes.index') }}">{{ __('boxes.box_list') }}</a></li>
-    @if ($box->parent)
-        <li class="breadcrumb-item"><a href="{{ route('boxes.show', $box->parent) }}">{{ $box->parent->code }}</a></li>
-    @endif
+    @foreach ($ancestors as $ancestor)
+        <li class="breadcrumb-item"><a href="{{ route('boxes.show', $ancestor) }}">{{ $ancestor->code }}</a></li>
+    @endforeach
     <li class="breadcrumb-item active" aria-current="page">{{ $box->code }}</li>
 @endsection
 
@@ -22,16 +22,15 @@
                                 class="badge text-bg-light border">{{ __('boxes.level', ['level' => $box->level]) }}</span>
                             <span class="badge text-bg-secondary">{{ $box->status_label }}</span>
                         </div>
-                        <h1 class="h3 mb-1">{{ $box->title }}</h1>
+                        <h1 class="h3 mb-1">{{ $box->code }}</h1>
                         @if ($box->parent)
                             <div class="text-muted">
                                 {{ __('boxes.inside') }} <a
-                                    href="{{ route('boxes.show', $box->parent) }}">{{ $box->parent->code }} -
-                                    {{ $box->parent->title }}</a>
+                                    href="{{ route('boxes.show', $box->parent) }}">{{ $box->parent->code }}</a>
                             </div>
                         @endif
                     </div>
-                    <div class="d-flex gap-2 align-self-start">
+                    <div class="d-flex w-100 justify-content-end gap-2 align-self-start ms-md-auto">
                         <a class="btn btn-outline-primary"
                             href="{{ route('boxes.create', ['parent_id' => $box->id]) }}">{{ __('boxes.add_child') }}</a>
                         <a class="btn btn-outline-secondary"
@@ -86,7 +85,7 @@
                         @foreach ($box->children as $child)
                             <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                                 href="{{ route('boxes.show', $child) }}">
-                                <span>{{ $child->code }} - {{ $child->title }}</span>
+                                <span>{{ $child->code }}</span>
                                 <span
                                     class="badge text-bg-light border">{{ __('boxes.level', ['level' => $child->level]) }}</span>
                             </a>
@@ -109,7 +108,7 @@
             <div class="bg-white border rounded-3 p-4">
                 <h2 class="h5">{{ __('boxes.actions') }}</h2>
                 <div class="d-grid gap-2">
-                    <a class="btn btn-outline-primary"
+                    <a class="btn btn-outline-primary text-start text-md-center"
                         href="{{ route('boxes.create', ['parent_id' => $box->id]) }}">{{ __('boxes.add_child_box') }}</a>
                     <a class="btn btn-outline-secondary"
                         href="{{ route('boxes.index') }}">{{ __('boxes.back_to_list') }}</a>
