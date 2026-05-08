@@ -18,9 +18,17 @@
                                 </p>
                             @endif
                         </div>
-                        <div class="d-flex justify-content-end">
-                            <a class="btn btn-sm btn-outline-primary ms-auto align-self-start"
+                        <div class="d-flex justify-content-end gap-2">
+                            <a class="btn btn-sm btn-outline-primary align-self-start"
                                 href="{{ route('boxes.create', ['parent_id' => $box->id]) }}">{{ __('boxes.add_child') }}</a>
+                            <form method="POST" action="{{ route('boxes.destroy', $box) }}" style="display: inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger align-self-start"
+                                    onclick="return confirm('{{ __('boxes.delete_confirm') }}');">
+                                    {{ __('boxes.delete') }}
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
