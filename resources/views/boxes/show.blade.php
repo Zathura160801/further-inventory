@@ -98,7 +98,7 @@
                 <h2 class="h5">{{ __('boxes.qr_heading') }}</h2>
                 <div id="qr-code" class="d-inline-block my-3" aria-label="QR {{ $box->code }}"></div>
                 <div class="fw-semibold fs-5">{{ $box->code }}</div>
-                <div class="small text-muted text-break">{{ route('boxes.qr.show', $box->qr_uuid) }}</div>
+                <div class="small text-muted text-break">{{ $box->qr_uuid }}</div>
                 <a id="download-qr" class="btn btn-outline-primary mt-3" href="#"
                     download="{{ $box->code }}-qr.png">{{ __('boxes.download_qr') }}</a>
             </div>
@@ -129,7 +129,7 @@
         const downloadLink = document.getElementById('download-qr');
 
         new QRCode(qrElement, {
-            text: @json(route('boxes.qr.show', $box->qr_uuid)),
+            text: @json($box->qr_uuid),
             width: 220,
             height: 220,
         });
