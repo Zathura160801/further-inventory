@@ -25,7 +25,7 @@ return [
     'contents' => 'Box contents',
     'notes' => 'Notes',
     'photos' => 'Box photos',
-    'photos_help' => 'You can add photos more than once before saving. Maximum 4 MB per photo.',
+    'photos_help' => 'You can add photos more than once before saving. Maximum 10 MB per photo.',
     'batch_upload_photos' => 'Batch Upload Photos',
     'add_photos' => 'Add Photos',
     'choose_photos' => 'Choose photos',

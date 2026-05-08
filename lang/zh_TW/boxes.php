@@ -25,7 +25,7 @@ return [
     'status' => '狀態',
     'contents' => '紙箱內容說明',
     'photos' => '紙箱照片',
-    'photos_help' => '儲存前可多次加入照片。每張照片最大 4 MB。',
+    'photos_help' => '儲存前可多次加入照片。每張照片最大 10 MB。',
     'batch_upload_photos' => '批次上傳照片',
     'add_photos' => '加入照片',
     'choose_photos' => '選擇照片',

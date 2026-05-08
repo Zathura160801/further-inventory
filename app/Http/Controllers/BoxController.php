@@ -49,7 +49,7 @@ class BoxController extends Controller
             'description' => ['nullable', 'string'],
             'status' => ['required', Rule::in(['packed', 'unpacked'])],
             'images' => ['nullable', 'array'],
-            'images.*' => ['image', 'max:4096'],
+            'images.*' => ['image', 'max:10240'],
         ]);
 
         $parent = Box::find($validated['parent_id'] ?? null);
@@ -98,7 +98,7 @@ class BoxController extends Controller
             'description' => ['nullable', 'string'],
             'status' => ['required', Rule::in(['packed', 'unpacked'])],
             'images' => ['nullable', 'array'],
-            'images.*' => ['image', 'max:4096'],
+            'images.*' => ['image', 'max:10240'],
         ]);
 
         $parent = Box::find($validated['parent_id'] ?? null);
@@ -141,7 +141,7 @@ class BoxController extends Controller
     {
         $request->validate([
             'images' => ['nullable', 'array'],
-            'images.*' => ['image', 'max:4096'],
+            'images.*' => ['image', 'max:10240'],
         ]);
 
         $this->storeImages($request, $box);
